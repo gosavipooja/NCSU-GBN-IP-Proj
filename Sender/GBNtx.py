@@ -1,5 +1,6 @@
+import os
 import sys
-sys.path.append('../')
+sys.path.append(os.path.abspath('../'))
 
 import socket
 from Packet import Packet
@@ -19,7 +20,7 @@ class GBNtx:
 
         self.reader = open(filenm,'r')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('127.0.0.1', 7000))
+        self.sock.bind(('192.168.1.11', 7000))
 
         self.window = []
         self.Sb = 0
@@ -150,7 +151,7 @@ class GBNtx:
 
 
 
-g = GBNtx("../UT/in.txt", 128, 1024,'127.0.0.1')
+g = GBNtx("../UT/in.txt", 5, 1024,'152.1.13.88')
 
 start_time = time.time()
 g.start()

@@ -1,10 +1,12 @@
+import os
+import sys
+sys.path.append(os.path.abspath('../'))
+
 from Packet import Packet
 import socket
 from Constants import *
 import array
 import random
-import sys
-sys.path.append('../')
 
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
