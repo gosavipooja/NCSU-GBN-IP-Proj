@@ -34,14 +34,20 @@ class GBNtx:
 
     #Send all the packets in the window
     def send_window(self,start=0):
+        # print "Time Out. Sending packets"
         for p in self.window[start:]:
             self.sock.sendto(p.generate_udp_payload(), self.server_addr)
-            print "Sending PKT %d" % (p.seq_num)
+            print "Timeout, sequence number = %d" % (p.seq_num)
 
 
 
     #Update window by removing n packets from front and adding at the end
     def update_window(self,n_pkts):
+        if(n_pkts == 0):
+            return n_pkts
+
+        print "Update window : %d"%(n_pkts)
+
         new_pkts = []
         for i in range(n_pkts):
             p = self.get_packet()
@@ -58,9 +64,10 @@ class GBNtx:
         self.window = self.window + new_pkts
 
         #update alarm
-        if self.timer_ev:
+        if self.timer_ev and not self.scheduler.empty():
             self.scheduler.cancel(self.timer_ev)
-        # self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
+        self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
+        self.scheduler.run()
 
         return len(new_pkts)
 

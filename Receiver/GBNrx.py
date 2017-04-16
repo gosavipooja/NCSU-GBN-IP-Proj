@@ -2,6 +2,7 @@ from Packet import Packet
 import socket
 from Constants import *
 import array
+import random
 
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
@@ -27,6 +28,10 @@ class GBNrx:
             p = Packet.build_packet(data)
             # print p
 
+            if self.discard_pkt():
+                print "Packet loss, sequence number = %d"%p.seq_num
+                continue
+
             if (p.data == TERMINATOR):
                 self.eof = True
                 break
@@ -49,6 +54,9 @@ class GBNrx:
             self.Rn = self.Rn +1
             print "PKT %d successfully received"%(pkt.seq_num)
 
+            if self.eof:
+                pkt.data = pkt.data[:-3]
+
             #Write to file
             self.writer.write(pkt.data)
 
@@ -63,10 +71,13 @@ class GBNrx:
 
 
     def __del__(self):
-        # self.writer.close()
+        self.writer.close()
         self.sock.close()
 
-g=GBNrx("out.txt",0.5)
+    def discard_pkt(self):
+        return random.random() <= self.err_prob
+
+g=GBNrx("out.txt",0.2)
 g.start()
 
 del g
