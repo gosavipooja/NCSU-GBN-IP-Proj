@@ -147,6 +147,10 @@ class GBNtx:
 
 
 
-g = GBNtx("../UT/RFC 882.txt", 128, 1024,'127.0.0.1')
+g = GBNtx("../UT/in.txt", 128, 1024,'127.0.0.1')
 
+start_time = time.time()
 g.start()
+end_time = time.time()
+
+print "Transfer completed in %f seconds"%(end_time-start_time)
