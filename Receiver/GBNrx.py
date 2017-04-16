@@ -3,6 +3,8 @@ import socket
 from Constants import *
 import array
 import random
+import sys
+sys.path.append('../')
 
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
@@ -71,7 +73,7 @@ class GBNrx:
     def discard_pkt(self):
         return random.random() < self.err_prob
 
-g=GBNrx("out.txt",0.9)
+g=GBNrx("out.txt",0.05)
 g.start()
 
 del g

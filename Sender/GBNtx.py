@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import socket
 from Packet import Packet
 from Constants import *
