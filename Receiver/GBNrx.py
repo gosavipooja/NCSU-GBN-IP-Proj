@@ -32,14 +32,6 @@ class GBNrx:
                 print "Packet loss, sequence number = %d"%p.seq_num
                 continue
 
-            if (p.data == TERMINATOR):
-                self.eof = True
-                break
-
-            if p.data[-3:] == TERMINATOR:
-                self.eof = True
-                # p.data=p.data[:-3]
-
             self.process_pkt(p,addr)
 
         self.writer.close()
@@ -54,7 +46,9 @@ class GBNrx:
             self.Rn = self.Rn +1
             print "PKT %d successfully received"%(pkt.seq_num)
 
-            if self.eof:
+            #ensure that the last packet is received in order
+            if pkt.data[-3:] == TERMINATOR:
+                self.eof = True
                 pkt.data = pkt.data[:-3]
 
             #Write to file
@@ -75,7 +69,7 @@ class GBNrx:
         self.sock.close()
 
     def discard_pkt(self):
-        return random.random() <= self.err_prob
+        return random.random() < self.err_prob
 
 g=GBNrx("out.txt",0.9)
 g.start()

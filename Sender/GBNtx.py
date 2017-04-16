@@ -20,7 +20,7 @@ class GBNtx:
 
         self.window = []
         self.Sb = 0
-        self.Sm = N -1
+        self.Sm = -1#N -1
 
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.timer_ev = None
@@ -88,6 +88,10 @@ class GBNtx:
         for i in range(self.N):
             p = self.get_packet()
             self.window.append(p)
+            self.Sm = self.Sm +1
+            if self.eof:
+                break
+
 
         #Send the packets in the window
         self.send_window()
@@ -135,7 +139,7 @@ class GBNtx:
         return s
 
     def alram_trigerrer(self):
-        while not self.eof:
+        while len(self.window)>0:
             if self.scheduler.empty():
                 self.timer_ev = self.scheduler.enter(TIME_OUT, 1, self.send_window, ())
                 self.scheduler.run()
@@ -143,6 +147,6 @@ class GBNtx:
 
 
 
-g = GBNtx("../UT/RFC 882.txt", 10, 1024,'127.0.0.1')
+g = GBNtx("../UT/RFC 882.txt", 128, 1024,'127.0.0.1')
 
 g.start()
