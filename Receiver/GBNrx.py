@@ -7,6 +7,7 @@ import socket
 from Constants import *
 import array
 import random
+from Utils import *
 
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
@@ -15,6 +16,7 @@ class GBNrx:
         self.writer = open(filnm,'w+')
         self.err_prob = err_prob
 
+        self.my_ip = get_my_ip()
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.sock.bind(('127.0.0.1',port))
 

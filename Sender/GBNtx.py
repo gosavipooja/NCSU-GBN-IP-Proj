@@ -10,6 +10,7 @@ import sched
 import threading
 import time
 import thread
+from Utils import *
 
 class GBNtx:
 
@@ -20,7 +21,9 @@ class GBNtx:
 
         self.reader = open(filenm,'r')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('192.168.1.11', 7000))
+
+        self.my_ip = get_my_ip()
+        self.sock.bind((self.my_ip, 7000))
 
         self.window = []
         self.Sb = 0
