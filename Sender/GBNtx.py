@@ -5,6 +5,7 @@ from Constants import *
 import sched
 import threading
 import time
+import thread
 
 class GBNtx:
 
@@ -23,6 +24,7 @@ class GBNtx:
 
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.timer_ev = None
+
 
         self.eof = False
 
@@ -58,16 +60,17 @@ class GBNtx:
                 print "Sending PKT %d"%(p.seq_num)
 
         #Delete elments at the beginning
-        del self.window[:n_pkts]
+        if len(self.window)>0:
+            del self.window[:n_pkts]
 
         #append the new list to the window
         self.window = self.window + new_pkts
 
         #update alarm
-        if self.timer_ev and not self.scheduler.empty():
+        if not self.scheduler.empty():
             self.scheduler.cancel(self.timer_ev)
-        self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
-        self.scheduler.run()
+            self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
+            self.scheduler.run()
 
         return len(new_pkts)
 
@@ -88,6 +91,7 @@ class GBNtx:
 
         #Send the packets in the window
         self.send_window()
+        thread.start_new_thread(self.alram_trigerrer,())
 
         while len(self.window)>0:
             # receive data from client
@@ -97,10 +101,11 @@ class GBNtx:
             p = Packet.build_packet(data,is_ack=True)
 
             if(p.seq_num > self.Sb):
-                print "Rcvd ACK %d. Moving forward"%(p.seq_num)
                 new_pkts = self.update_window(p.seq_num-self.Sb)
                 self.Sm = self.Sm + new_pkts
                 self.Sb = p.seq_num
+                print "Rcvd ACK %d. Moving forward to %d"%(p.seq_num,self.Sm)
+
             else:
                 print "Wrong ACK %d rcvd"%(p.seq_num)
 
@@ -129,7 +134,15 @@ class GBNtx:
         s = self.reader.read(1)
         return s
 
+    def alram_trigerrer(self):
+        while not self.eof:
+            if self.scheduler.empty():
+                self.timer_ev = self.scheduler.enter(TIME_OUT, 1, self.send_window, ())
+                self.scheduler.run()
+            time.sleep(TIME_OUT/2)
 
-g = GBNtx("../UT/RFC 882.txt", 5, 1024,'127.0.0.1')
+
+
+g = GBNtx("../UT/RFC 882.txt", 10, 1024,'127.0.0.1')
 
 g.start()

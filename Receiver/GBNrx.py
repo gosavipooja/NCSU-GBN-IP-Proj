@@ -77,7 +77,7 @@ class GBNrx:
     def discard_pkt(self):
         return random.random() <= self.err_prob
 
-g=GBNrx("out.txt",0.2)
+g=GBNrx("out.txt",0.9)
 g.start()
 
 del g
