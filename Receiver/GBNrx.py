@@ -1,6 +1,7 @@
 from Packet import Packet
 import socket
 from Constants import *
+import array
 
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
@@ -32,7 +33,7 @@ class GBNrx:
 
             if p.data[-3:] == TERMINATOR:
                 self.eof = True
-                p.data=p.data[:-3]
+                # p.data=p.data[:-3]
 
             self.process_pkt(p,addr)
 

@@ -60,7 +60,7 @@ class GBNtx:
         #update alarm
         if self.timer_ev:
             self.scheduler.cancel(self.timer_ev)
-        self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
+        # self.timer_ev = self.scheduler.enter(TIME_OUT,1,self.send_window,())
 
         return len(new_pkts)
 
@@ -123,6 +123,6 @@ class GBNtx:
         return s
 
 
-g = GBNtx("../UT/RFC 882.txt", 10, 512,'127.0.0.1')
+g = GBNtx("../UT/RFC 882.txt", 5, 1024,'127.0.0.1')
 
 g.start()
