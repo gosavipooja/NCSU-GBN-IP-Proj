@@ -23,8 +23,9 @@ class GBNtx:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.my_ip = get_my_ip()
-        self.sock.bind((self.my_ip, 7000))
-
+        print "My IP = %s"%self.my_ip
+        # self.sock.bind((self.my_ip, 7000))
+        self.sock.bind(('127.0.0.1', 7000))
         self.window = []
         self.Sb = 0
         self.Sm = -1#N -1
@@ -128,7 +129,7 @@ class GBNtx:
 
         data = ''
         #Read till MSS is reached or EOF is reached
-        while(len(data)<=self.MSS-8 and not self.eof):
+        while(len(data)<=self.MSS and not self.eof):
             c = self.rdt_send()
             if c == '':
                 self.reader.close()
@@ -153,11 +154,23 @@ class GBNtx:
             time.sleep(TIME_OUT/2)
 
 
+if __name__ == "__main__":
+    if len(sys.argv)<6:
+        print "Usage:"
+        print "%s <server-hostname> <server-port> <file> <N> <MSS>"%(sys.argv[0])
+        exit(-1)
 
-g = GBNtx("../UT/in.txt", 5, 1024,'152.1.13.88')
+    s_ip = sys.argv[1]
+    s_port = int(sys.argv[2])
+    filenm = sys.argv[3]
+    N = int(sys.argv[4])
+    MSS = int(sys.argv[5])
 
-start_time = time.time()
-g.start()
-end_time = time.time()
+    g = GBNtx(filenm, N, MSS,s_ip,s_port)
 
-print "Transfer completed in %f seconds"%(end_time-start_time)
+    start_time = time.time()
+    g.start()
+    end_time = time.time()
+    del g
+
+    print "Transfer completed in %f seconds"%(end_time-start_time)

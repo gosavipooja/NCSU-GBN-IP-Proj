@@ -77,7 +77,17 @@ class GBNrx:
     def discard_pkt(self):
         return random.random() < self.err_prob
 
-g=GBNrx("out.txt",0.05)
-g.start()
+if __name__ == "__main__":
+    if len(sys.argv)<4:
+        print "Usage:"
+        print "%s <port> <file> <error-probability>"%(sys.argv[0])
+        exit(-1)
 
-del g
+    port = int(sys.argv[1])
+    filenm = sys.argv[2]
+    p = float(sys.argv[3])
+
+    g=GBNrx(filenm,p,port)
+    g.start()
+
+    del g
