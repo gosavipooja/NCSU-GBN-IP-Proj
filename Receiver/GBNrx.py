@@ -41,7 +41,7 @@ class GBNrx:
             # print p
 
             if self.discard_pkt():
-                print "Packet loss, sequence number = %d"%p.seq_num
+                #print "Packet loss, sequence number = %d"%p.seq_num
                 continue
 
             self.process_pkt(p,addr)
@@ -93,7 +93,6 @@ if __name__ == "__main__":
     port = int(sys.argv[1])
     filenm = sys.argv[2]
     p = float(sys.argv[3])
-
     g=GBNrx(filenm,p,port)
     g.start()
 
