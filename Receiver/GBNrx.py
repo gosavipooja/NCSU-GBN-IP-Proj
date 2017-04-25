@@ -21,11 +21,12 @@ class GBNrx:
 
         self.my_ip = get_my_ip()
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        # self.sock.bind((self.my_ip,port))
-        self.sock.bind(('127.0.0.1', port))
+        self.sock.bind((self.my_ip,port))
+        # self.sock.bind(('127.0.0.1', port))
         self.eof = False
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger("Receiver")
+        self.logger.disabled = True
 
 
     def start(self):
@@ -68,6 +69,7 @@ class GBNrx:
         else:
             self.logger.info("PKT %d received out of order"%(pkt.seq_num))
             # print pkt
+            # pass
 
         #Generate ACK packet and send to the sender
         ack_pkt = Packet.build_ack_packet(self.exp_seq)
