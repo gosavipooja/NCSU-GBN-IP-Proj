@@ -27,3 +27,22 @@ def get_my_ip():
     val = s.getsockname()[0]
     s.close()
     return val
+
+# From stackoverflow: http://stackoverflow.com/questions/3949726/calculate-ip-checksum-in-python
+def carry_around_add(a, b):
+    c = a + b
+    return (c & 0xffff) + (c >> 16)
+
+def checksum(msg):
+    #zero padding
+    if(len(msg)%2==1):
+        msg = msg + '\x00'
+    s = 0
+    for i in range(0, len(msg), 2):
+        w = ord(msg[i]) + (ord(msg[i+1]) << 8)
+        s = carry_around_add(s, w)
+    return ~s & 0xffff
+
+
+# msg = "hello"
+# print "0x%X"%checksum(msg)

@@ -7,14 +7,17 @@ class Packet:
 
     def __init__(self,data = None):
         if data is not None:
-            self.data = data
-            self.checksum = generate_chksum(data)
-            self.indicator = DATA_PKT_IDENTIFIER
             self.seq_num = Packet.num_pkts
             Packet.num_pkts = Packet.num_pkts + 1
+            self.data = data
+            # self.checksum = generate_chksum(data)
+            self.checksum = checksum(data)
+            self.indicator = DATA_PKT_IDENTIFIER
+
 
     def valid_checksum(self):
-        computed_chksum = generate_chksum(self.data)
+        # computed_chksum = generate_chksum(self.data)
+        computed_chksum = checksum(self.data)
         return computed_chksum==self.checksum
 
     def generate_udp_payload(self):
