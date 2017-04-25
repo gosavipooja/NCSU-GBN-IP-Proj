@@ -51,7 +51,7 @@ class GBNtx:
         # print "Time Out. Sending packets"
         for p in self.window[start:]:
             self.sock.sendto(p.generate_udp_payload(), self.server_addr)
-            print "Timeout, sequence number = %d" % (p.seq_num)
+            # print "Timeout, sequence number = %d" % (p.seq_num)
 
 
 
