@@ -38,7 +38,7 @@ class GBNtx:
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger("Sender")
-        self.logger.disabled = False
+        self.logger.disabled = True
 
 
     def __del__(self):
