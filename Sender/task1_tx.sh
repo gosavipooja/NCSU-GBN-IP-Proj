@@ -18,9 +18,10 @@ for N in ${N_arr[*]};
 do
 	for i in `seq 1 5`;
 	do
+		N=10
 		python $src $s_ip $s_port $filenm $N $MSS
 		echo "N=$N Iter=$i"
-		#exit 0
+		exit 0
 	done
 done
 
