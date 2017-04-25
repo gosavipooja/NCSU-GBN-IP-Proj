@@ -24,7 +24,7 @@ class GBNtx:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.my_ip = get_my_ip()
-        print "My IP = %s"%self.my_ip
+        # print "My IP = %s"%self.my_ip
         # self.sock.bind((self.my_ip, 7000))
         self.sock.bind(('127.0.0.1', 7000))
         self.window = []
@@ -38,6 +38,7 @@ class GBNtx:
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger("Sender")
+        self.logger.disabled = False
 
 
     def __del__(self):
@@ -59,7 +60,7 @@ class GBNtx:
         if(n_pkts == 0):
             return n_pkts
 
-            self.logger.info( "Update window : %d"%(n_pkts))
+            # self.logger.info( "Update window : %d"%(n_pkts))
 
         new_pkts = []
         for i in range(n_pkts):
@@ -68,7 +69,7 @@ class GBNtx:
                 new_pkts.append(p)
                 #Send data
                 self.sock.sendto(p.generate_udp_payload(), self.server_addr)
-                self.logger.info("Sending PKT %d"%(p.seq_num))
+                # self.logger.info("Sending PKT %d"%(p.seq_num))
 
         #Delete elments at the beginning
         if len(self.window)>0:
@@ -119,11 +120,11 @@ class GBNtx:
                 new_pkts = self.update_window(p.seq_num - self.win_head)
                 self.win_tail = self.win_tail + new_pkts
                 self.win_head = p.seq_num
-                self.logger.info( "Rcvd ACK %d. Moving forward to %d" % (p.seq_num,self.win_tail))
+                # self.logger.info( "Rcvd ACK %d. Moving forward to %d" % (p.seq_num,self.win_tail))
 
             else:
-                self.logger.info( "Wrong ACK %d rcvd"%(p.seq_num))
-
+                # self.logger.info( "Wrong ACK %d rcvd"%(p.seq_num))
+                pass
 
 
     def get_packet(self):
@@ -153,7 +154,9 @@ class GBNtx:
         while len(self.window)>0:
             if self.scheduler.empty():
                 self.timer_ev = self.scheduler.enter(TIME_OUT, 1, self.send_window, ())
-                self.scheduler.run()
+                #Bug fix
+                if not self.scheduler.empty():
+                    self.scheduler.run()
             time.sleep(TIME_OUT/2)
 
 
