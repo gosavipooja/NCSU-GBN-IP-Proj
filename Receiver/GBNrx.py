@@ -9,18 +9,23 @@ import array
 import random
 from Utils import *
 
+import logging
+
+
 class GBNrx:
     def __init__(self, filnm, err_prob, port=7735):
-        self.Rn = 0 # expected Request number
+        self.exp_seq = 0 # expected Request number
         self.port = port
         self.writer = open(filnm,'w+')
         self.err_prob = err_prob
 
         self.my_ip = get_my_ip()
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        self.sock.bind(('127.0.0.1',port))
-
+        # self.sock.bind((self.my_ip,port))
+        self.sock.bind(('127.0.0.1', port))
         self.eof = False
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger("Receiver")
 
 
     def start(self):
@@ -47,10 +52,10 @@ class GBNrx:
 
     # Checks if the given packet was in the expected order
     def process_pkt(self,pkt,addr):
-        if pkt.seq_num == self.Rn and pkt.valid_checksum() :
+        if pkt.seq_num == self.exp_seq and pkt.valid_checksum() :
             #Increment value of Rn
-            self.Rn = self.Rn +1
-            print "PKT %d successfully received"%(pkt.seq_num)
+            self.exp_seq = self.exp_seq + 1
+            self.logger.info("PKT %d successfully received"%(pkt.seq_num))
 
             #ensure that the last packet is received in order
             if pkt.data[-3:] == TERMINATOR:
@@ -61,12 +66,12 @@ class GBNrx:
             self.writer.write(pkt.data)
 
         else:
-            print "PKT %d received out of order"%(pkt.seq_num)
+            self.logger.info("PKT %d received out of order"%(pkt.seq_num))
             # print pkt
 
         #Generate ACK packet and send to the sender
-        ack_pkt = Packet.build_ack_packet(self.Rn)
-        print "Sent ACK %d"%(self.Rn)
+        ack_pkt = Packet.build_ack_packet(self.exp_seq)
+        self.logger.info("Sent ACK %d" % (self.exp_seq))
         self.sock.sendto(ack_pkt.generate_udp_payload(),addr)
 
 

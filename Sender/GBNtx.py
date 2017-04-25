@@ -11,6 +11,7 @@ import threading
 import time
 import thread
 from Utils import *
+import logging
 
 class GBNtx:
 
@@ -27,14 +28,16 @@ class GBNtx:
         # self.sock.bind((self.my_ip, 7000))
         self.sock.bind(('127.0.0.1', 7000))
         self.window = []
-        self.Sb = 0
-        self.Sm = -1#N -1
+        self.win_head = 0
+        self.win_tail = -1#N -1
 
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.timer_ev = None
 
-
         self.eof = False
+
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger("Sender")
 
 
     def __del__(self):
@@ -56,7 +59,7 @@ class GBNtx:
         if(n_pkts == 0):
             return n_pkts
 
-        print "Update window : %d"%(n_pkts)
+            self.logger.info( "Update window : %d"%(n_pkts))
 
         new_pkts = []
         for i in range(n_pkts):
@@ -65,7 +68,7 @@ class GBNtx:
                 new_pkts.append(p)
                 #Send data
                 self.sock.sendto(p.generate_udp_payload(), self.server_addr)
-                print "Sending PKT %d"%(p.seq_num)
+                self.logger.info("Sending PKT %d"%(p.seq_num))
 
         #Delete elments at the beginning
         if len(self.window)>0:
@@ -96,7 +99,7 @@ class GBNtx:
         for i in range(self.N):
             p = self.get_packet()
             self.window.append(p)
-            self.Sm = self.Sm +1
+            self.win_tail = self.win_tail + 1
             if self.eof:
                 break
 
@@ -112,14 +115,14 @@ class GBNtx:
             #create ACK packet from the received data
             p = Packet.build_packet(data,is_ack=True)
 
-            if(p.seq_num > self.Sb):
-                new_pkts = self.update_window(p.seq_num-self.Sb)
-                self.Sm = self.Sm + new_pkts
-                self.Sb = p.seq_num
-                print "Rcvd ACK %d. Moving forward to %d"%(p.seq_num,self.Sm)
+            if(p.seq_num > self.win_head):
+                new_pkts = self.update_window(p.seq_num - self.win_head)
+                self.win_tail = self.win_tail + new_pkts
+                self.win_head = p.seq_num
+                self.logger.info( "Rcvd ACK %d. Moving forward to %d" % (p.seq_num,self.win_tail))
 
             else:
-                print "Wrong ACK %d rcvd"%(p.seq_num)
+                self.logger.info( "Wrong ACK %d rcvd"%(p.seq_num))
 
 
 
