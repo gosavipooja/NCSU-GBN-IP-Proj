@@ -41,7 +41,7 @@ class GBNrx:
             # print p
 
             if self.discard_pkt():
-                #print "Packet loss, sequence number = %d"%p.seq_num
+                print "Packet loss, sequence number = %d"%p.seq_num
                 continue
 
             self.process_pkt(p,addr)
